@@ -6,22 +6,23 @@
     <title>IELTS Writing Simulator</title>
     <style>
         :root {
-            --bg-body: #f0f2f5;
-            --bg-panel: #ffffff;
-            --text-main: #333333;
-            --text-muted: #666666;
-            --border-color: #cccccc;
-            --accent-color: #0056b3;
+            /* --- EYE COMFORT LIGHT MODE --- */
+            --bg-body: #dce1e6;   /* Much darker, softer grey-blue background */
+            --bg-panel: #f9f9f9;  /* Off-white panels (not pure white) */
+            --text-main: #0b0b0b; /* Pitch black for maximum readability */
+            --text-muted: #444444;/* Dark grey (no longer faint) */
+            --border-color: #aaaaaa; /* Stronger borders */
+            --accent-color: #004494; /* Darker blue for less eye strain */
             --textarea-bg: #ffffff;
-            --timer-color: #222222;
-            --drag-bg: #e3f2fd;
+            --timer-color: #000000;
+            --drag-bg: #e1eef9;
         }
 
         body.dark-mode {
             --bg-body: #121212;
             --bg-panel: #1e1e1e;
             --text-main: #e0e0e0;
-            --text-muted: #aaaaaa;
+            --text-muted: #bbbbbb; /* Lighter grey for dark mode contrast */
             --border-color: #444444;
             --accent-color: #4dabf7;
             --textarea-bg: #252525;
@@ -64,7 +65,7 @@
 
         .task-toggle {
             display: flex;
-            background: var(--bg-body);
+            background: var(--bg-body); /* Matches darker body now */
             border: 1px solid var(--border-color);
             border-radius: 4px;
             overflow: hidden;
@@ -77,6 +78,7 @@
             cursor: pointer;
             font-size: 0.8rem;
             color: var(--text-muted);
+            font-weight: 600; /* Bolder text */
         }
         .task-btn.active { background: var(--accent-color); color: white; font-weight: bold; }
 
@@ -84,7 +86,7 @@
 
         #timer-display {
             font-size: 1.8rem;
-            font-weight: bold;
+            font-weight: 800; /* Extra bold */
             color: var(--timer-color);
             font-variant-numeric: tabular-nums;
             min-width: 90px;
@@ -96,10 +98,10 @@
             font-size: 0.85rem;
             cursor: pointer;
             border: 1px solid var(--border-color);
-            background-color: var(--bg-body);
+            background-color: var(--bg-panel); /* Buttons match panel now */
             color: var(--text-main);
             border-radius: 4px;
-            font-weight: 600;
+            font-weight: 700; /* Bolder for readability */
         }
         .btn:hover { background-color: var(--border-color); }
 
@@ -122,16 +124,23 @@
             flex-shrink: 0;
         }
 
-        h3, h4 { margin: 0; font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        h3, h4 { 
+            margin: 0; 
+            font-size: 0.9rem; 
+            color: var(--text-muted); /* Darker now */
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
 
-        /* TEXT ZOOM CONTROLS (Right Side & Task 2 Left) */
+        /* ZOOM CONTROLS */
         .zoom-controls { display: flex; gap: 5px; }
         .zoom-btn {
             background: transparent;
             border: 1px solid var(--border-color);
             color: var(--text-muted);
-            width: 24px;
-            height: 24px;
+            width: 28px; /* Slightly bigger targets */
+            height: 28px;
             border-radius: 4px;
             cursor: pointer;
             display: flex;
@@ -158,21 +167,21 @@
             width: 100%;
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            padding: 12px;
+            padding: 15px;
             font-family: Arial, Helvetica, sans-serif;
             font-size: 1rem;
-            line-height: 1.5;
+            line-height: 1.6;
             resize: none;
             background-color: var(--textarea-bg);
             color: var(--text-main);
             outline: none;
         }
-        textarea:focus { border-color: var(--accent-color); }
+        textarea:focus { border-color: var(--accent-color); box-shadow: 0 0 0 1px var(--accent-color); }
 
         #prompt-container { display: flex; flex-direction: column; flex: 1; min-height: 0; }
         #prompt-text-area { height: 100%; min-height: 150px; }
 
-        /* IMAGE AREA (The Thumbnail View) */
+        /* IMAGE AREA */
         #prompt-image-area {
             display: none; 
             flex: 1;
@@ -184,7 +193,7 @@
             position: relative;
             overflow: hidden;
             min-height: 300px;
-            cursor: pointer; /* Indicates Clickable */
+            cursor: pointer;
             transition: border-color 0.2s;
         }
         
@@ -198,7 +207,7 @@
             display: none;
         }
 
-        /* OVERLAY / LIGHTBOX (Hidden by default) */
+        /* LIGHTBOX */
         #lightbox-modal {
             display: none;
             position: fixed;
@@ -207,7 +216,7 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.85); /* Dark background */
+            background-color: rgba(0,0,0,0.9);
             justify-content: center;
             align-items: center;
             flex-direction: column;
@@ -217,31 +226,31 @@
             max-width: 95%;
             max-height: 90%;
             object-fit: contain;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
             border-radius: 4px;
         }
 
         #lightbox-msg {
-            color: #fff;
+            color: #ccc;
             margin-top: 15px;
             font-family: sans-serif;
-            font-size: 0.9rem;
-            opacity: 0.8;
+            font-size: 1rem;
         }
 
         .upload-msg {
             text-align: center; color: var(--text-muted); pointer-events: none;
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
+        .upload-msg p { margin-bottom: 5px; }
 
         .planning-section { display: flex; flex-direction: column; min-height: 200px; }
         .planning-grid { display: flex; gap: 10px; flex: 1; }
         .plan-box { flex: 1; display: flex; flex-direction: column; }
-        .plan-box textarea { flex: 1; font-size: 0.85rem; }
+        .plan-box textarea { flex: 1; font-size: 0.9rem; }
         body.mode-task1 #note-box-2 { display: none; }
 
         #essay-input { flex: 1; margin-bottom: 10px; transition: font-size 0.2s; }
-        #word-count-display { text-align: right; font-weight: bold; color: var(--text-muted); font-size: 0.9rem; }
+        #word-count-display { text-align: right; font-weight: 700; color: var(--text-muted); font-size: 0.95rem; }
     </style>
 </head>
 <body class="mode-task1">
@@ -442,7 +451,7 @@
                 promptText.style.display = 'none';
                 promptImgArea.style.display = 'flex';
                 noteBox2.style.display = 'none';
-                promptTextZoom.style.display = 'none'; // Hide text zoom for image mode
+                promptTextZoom.style.display = 'none'; 
                 
                 modeTask1.classList.add('active');
                 modeTask2.classList.remove('active');
@@ -456,7 +465,7 @@
                 promptText.style.display = 'block';
                 promptImgArea.style.display = 'none';
                 noteBox2.style.display = 'flex';
-                promptTextZoom.style.display = 'flex'; // Show text zoom
+                promptTextZoom.style.display = 'flex'; 
                 
                 modeTask1.classList.remove('active');
                 modeTask2.classList.add('active');
@@ -472,16 +481,14 @@
                 reader.onload = (e) => {
                     promptImgDisplay.src = e.target.result;
                     promptImgDisplay.style.display = 'block';
-                    lightboxImg.src = e.target.result; // Update lightbox src too
+                    lightboxImg.src = e.target.result;
                     uploadMsg.style.display = 'none';
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        // Click Logic
         promptImgArea.addEventListener('click', (e) => {
-            // If image exists, open Lightbox. If not, open File picker.
             if(promptImgDisplay.style.display === 'block') {
                 lightboxModal.style.display = 'flex';
             } else {
@@ -489,7 +496,6 @@
             }
         });
 
-        // Close Lightbox logic
         lightboxModal.addEventListener('click', () => {
             lightboxModal.style.display = 'none';
         });
