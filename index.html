@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Writing Simulator</title>
+    <style>
+        :root {
+            --bg-body: #f0f2f5;
+            --bg-panel: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-color: #cccccc;
+            --accent-color: #0056b3;
+            --textarea-bg: #ffffff;
+            --timer-color: #222222;
+            --drag-bg: #e3f2fd;
+        }
+
+        body.dark-mode {
+            --bg-body: #121212;
+            --bg-panel: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-muted: #aaaaaa;
+            --border-color: #444444;
+            --accent-color: #4dabf7;
+            --textarea-bg: #252525;
+            --timer-color: #ffffff;
+            --drag-bg: #1a3b5c;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* HEADER */
+        header {
+            height: 60px;
+            background-color: var(--bg-panel);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            width: 200px;
+        }
+
+        .header-right { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            width: 200px;
+            justify-content: flex-end; 
+        }
+
+        /* Github Link */
+        .github-link {
+            display: flex;
+            align-items: center;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .github-link:hover { opacity: 1; }
+        .github-link svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-main);
+        }
+
+        .task-toggle {
+            display: flex;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .task-btn {
+            padding: 5px 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .task-btn.active {
+            background: var(--accent-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        .center-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #timer-display {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--timer-color);
+            font-variant-numeric: tabular-nums;
+            min-width: 90px;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .btn:hover { background-color: var(--border-color); }
+
+        /* MAIN LAYOUT */
+        main { display: flex; flex: 1; overflow: hidden; }
+
+        .panel {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            transition: flex 0.3s ease; 
+        }
+
+        /* --- LAYOUT CONFIGURATION --- */
+        
+        /* TASK 2: Left 40%, Right 60% */
+        .panel-left {
+            flex: 4; 
+            border-right: 1px solid var(--border-color);
+            background-color: var(--bg-body);
+            gap: 15px;
+        }
+        .panel-right {
+            flex: 6; 
+            background-color: var(--bg-panel);
+        }
+
+        /* TASK 1: Left 50%, Right 50% */
+        body.mode-task1 .panel-left { flex: 5; }
+        body.mode-task1 .panel-right { flex: 5; }
+
+        h3, h4 {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        textarea {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 1rem;
+            line-height: 1.5;
+            resize: none;
+            background-color: var(--textarea-bg);
+            color: var(--text-main);
+            outline: none;
+        }
+        textarea:focus { border-color: var(--accent-color); }
+
+        /* PROMPT AREAS */
+        #prompt-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1; 
+            min-height: 0;
+        }
+
+        #prompt-text-area {
+            height: 100%;
+            min-height: 150px;
+        }
+
+        /* IMAGE UPLOADER STYLE */
+        #prompt-image-area {
+            display: none; 
+            flex: 1;
+            border: 2px dashed var(--border-color);
+            border-radius: 4px;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-panel);
+            position: relative;
+            overflow: hidden;
+            min-height: 300px;
+        }
+        
+        #prompt-image-area.drag-over {
+            background-color: var(--drag-bg);
+            border-color: var(--accent-color);
+        }
+
+        #prompt-image-display {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        .upload-msg {
+            text-align: center;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        /* PLANNING SECTION */
+        .planning-section {
+            display: flex;
+            flex-direction: column;
+            min-height: 200px; 
+        }
+        
+        .planning-grid { display: flex; gap: 10px; flex: 1; }
+        .plan-box { flex: 1; display: flex; flex-direction: column; }
+        .plan-box textarea { flex: 1; font-size: 0.85rem; }
+
+        /* Hide second note box in Task 1 */
+        body.mode-task1 #note-box-2 { display: none; }
+
+        #essay-input { flex: 1; margin-bottom: 10px; }
+        
+        #word-count-display {
+            text-align: right;
+            font-weight: bold;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body class="mode-task1"> <header>
+        <div class="header-left">
+            <div class="task-toggle">
+                <button class="task-btn active" id="mode-task1">Task 1</button>
+                <button class="task-btn" id="mode-task2">Task 2</button>
+            </div>
+        </div>
+
+        <div class="center-controls">
+            <div id="timer-display">20:00</div>
+            <button class="btn" id="btn-start">Start</button>
+            <button class="btn" id="btn-pause">Pause</button>
+            <button class="btn" id="btn-restart">Reset</button>
+        </div>
+
+        <div class="header-right">
+            <button class="btn" id="btn-download">💾 Save</button>
+            <button class="btn" id="theme-toggle">🌗</button>
+            <a href="https://github.com/spideyonmoon/ielts-writing-simulator" target="_blank" class="github-link" title="View on GitHub">
+                <svg viewBox="0 0 16 16" version="1.1" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <div class="panel panel-left">
+            
+            <div id="prompt-container">
+                <h3 id="prompt-label">Task 1 (Chart/Graph)</h3>
+                
+                <textarea id="prompt-text-area" placeholder="Paste your essay question here..." style="display: none;"></textarea>
+
+                <div id="prompt-image-area" style="display: flex;">
+                    <div class="upload-msg">
+                        <p><strong>Click or Paste (Ctrl+V)</strong></p>
+                        <p>to upload Chart/Graph</p>
+                    </div>
+                    <img id="prompt-image-display" alt="Task 1 Chart">
+                    <input type="file" id="file-input" accept="image/*" style="display: none;">
+                </div>
+            </div>
+
+            <div class="planning-section">
+                <div class="planning-grid">
+                    <div class="plan-box" id="note-box-1">
+                        <h4 id="notes-label-1">Quick Plan / Overview</h4>
+                        <textarea placeholder="Write notes here..." spellcheck="false"></textarea>
+                    </div>
+                    <div class="plan-box" id="note-box-2" style="display: none;">
+                        <h4>BP 2 Notes</h4>
+                        <textarea placeholder="Write notes here..." spellcheck="false"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-right">
+            <h3>Your Response</h3>
+            <textarea id="essay-input" placeholder="Start typing..." spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+            <div id="word-count-display">Words: 0</div>
+        </div>
+    </main>
+
+    <script>
+        // --- ELEMENTS ---
+        const body = document.body;
+        const timerDisplay = document.getElementById('timer-display');
+        const btnStart = document.getElementById('btn-start');
+        const btnPause = document.getElementById('btn-pause');
+        const btnRestart = document.getElementById('btn-restart');
+        const btnDownload = document.getElementById('btn-download');
+        const themeToggle = document.getElementById('theme-toggle');
+        const essayInput = document.getElementById('essay-input');
+        const wordCountDisplay = document.getElementById('word-count-display');
+        const modeTask1 = document.getElementById('mode-task1');
+        const modeTask2 = document.getElementById('mode-task2');
+        const promptLabel = document.getElementById('prompt-label');
+        const promptText = document.getElementById('prompt-text-area');
+        const promptImgArea = document.getElementById('prompt-image-area');
+        const promptImgDisplay = document.getElementById('prompt-image-display');
+        const uploadMsg = document.querySelector('.upload-msg');
+        const fileInput = document.getElementById('file-input');
+        const noteLabel1 = document.getElementById('notes-label-1');
+        const noteBox2 = document.getElementById('note-box-2');
+
+        // --- STATE ---
+        let totalTime = 20 * 60; // Default Task 1
+        let currentTime = totalTime;
+        let timerInterval = null;
+        let isRunning = false;
+        let isDarkMode = false;
+        let currentMode = 'task1'; // Default Task 1
+
+        // --- TIMER ---
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function updateTimerDisplay() {
+            timerDisplay.textContent = formatTime(currentTime);
+            const threshold = currentMode === 'task1' ? 120 : 300;
+            timerDisplay.style.color = currentTime < threshold ? '#d9534f' : 'var(--timer-color)';
+        }
+
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            btnStart.disabled = true;
+            timerInterval = setInterval(() => {
+                if (currentTime > 0) {
+                    currentTime--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    alert("Time is up!");
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (!isRunning) return;
+            clearInterval(timerInterval);
+            isRunning = false;
+            btnStart.disabled = false;
+            btnStart.textContent = "Resume";
+        }
+
+        function restartTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            currentTime = totalTime;
+            btnStart.disabled = false;
+            btnStart.textContent = "Start";
+            updateTimerDisplay();
+        }
+
+        // --- MODE SWITCHING ---
+        function setMode(mode) {
+            if(isRunning) {
+                if(!confirm("Switching modes will reset timer. Continue?")) return;
+                pauseTimer();
+            }
+            
+            currentMode = mode;
+            
+            if (mode === 'task1') {
+                body.classList.remove('mode-task2');
+                body.classList.add('mode-task1');
+                
+                totalTime = 20 * 60;
+                promptLabel.textContent = "Task 1 (Chart/Graph)";
+                noteLabel1.textContent = "Quick Plan / Overview";
+                
+                // UI Toggles
+                promptText.style.display = 'none';
+                promptImgArea.style.display = 'flex';
+                noteBox2.style.display = 'none';
+                
+                modeTask1.classList.add('active');
+                modeTask2.classList.remove('active');
+            } else {
+                body.classList.remove('mode-task1');
+                body.classList.add('mode-task2');
+                
+                totalTime = 40 * 60;
+                promptLabel.textContent = "Task 2 Prompt";
+                noteLabel1.textContent = "BP 1 Notes";
+                
+                // UI Toggles
+                promptText.style.display = 'block';
+                promptImgArea.style.display = 'none';
+                noteBox2.style.display = 'flex';
+                
+                modeTask1.classList.remove('active');
+                modeTask2.classList.add('active');
+            }
+            restartTimer();
+            updateWordCount();
+        }
+
+        // --- IMAGE UPLOAD ---
+        function handleFile(file) {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    promptImgDisplay.src = e.target.result;
+                    promptImgDisplay.style.display = 'block';
+                    uploadMsg.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        promptImgArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+        window.addEventListener('paste', (e) => {
+            if (currentMode !== 'task1') return;
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    const blob = item.getAsFile();
+                    handleFile(blob);
+                }
+            }
+        });
+
+        promptImgArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            promptImgArea.classList.add('drag-over');
+        });
+        promptImgArea.addEventListener('dragleave', () => promptImgArea.classList.remove('drag-over'));
+        promptImgArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            promptImgArea.classList.remove('drag-over');
+            handleFile(e.dataTransfer.files[0]);
+        });
+
+
+        // --- UTILS ---
+        function updateWordCount() {
+            const text = essayInput.value.trim();
+            const count = text === '' ? 0 : text.split(/\s+/).length;
+            
+            let color = 'var(--text-muted)';
+            const limit = currentMode === 'task1' ? 150 : 250;
+            
+            if (count > 0 && count < limit) color = '#d9534f'; 
+            if (count >= limit) color = '#28a745';
+
+            wordCountDisplay.textContent = `Words: ${count}`;
+            wordCountDisplay.style.color = color;
+        }
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            body.classList.toggle('dark-mode');
+        }
+
+        function downloadEssay() {
+            let promptContent = currentMode === 'task1' ? "[Image Content]" : promptText.value;
+            const text = `MODE: ${currentMode.toUpperCase()}\nPROMPT: ${promptContent}\n\nRESPONSE:\n${essayInput.value}`;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `IELTS_${currentMode}_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+        }
+
+        // --- LISTENERS ---
+        btnStart.addEventListener('click', startTimer);
+        btnPause.addEventListener('click', () => {
+            if (isRunning) pauseTimer();
+            else if (currentTime < totalTime && currentTime > 0) { startTimer(); btnPause.textContent = "Pause"; }
+        });
+        btnRestart.addEventListener('click', () => { if(confirm("Reset?")) restartTimer(); });
+        modeTask1.addEventListener('click', () => setMode('task1'));
+        modeTask2.addEventListener('click', () => setMode('task2'));
+        themeToggle.addEventListener('click', toggleTheme);
+        btnDownload.addEventListener('click', downloadEssay);
+        essayInput.addEventListener('input', updateWordCount);
+
+        updateTimerDisplay();
+    </script>
+</body>
+</html>
