@@ -110,12 +110,10 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            overflow-y: auto; /* Handles independent scrolling */
-            overflow-x: auto; /* Required for image zooming */
+            overflow-y: auto;
             transition: flex 0.3s ease; 
         }
 
-        /* PANEL HEADERS (Title + Zoom Controls) */
         .panel-header {
             display: flex;
             justify-content: space-between;
@@ -126,6 +124,7 @@
 
         h3, h4 { margin: 0; font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 
+        /* TEXT ZOOM CONTROLS (Right Side & Task 2 Left) */
         .zoom-controls { display: flex; gap: 5px; }
         .zoom-btn {
             background: transparent;
@@ -138,8 +137,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
-            line-height: 1;
+            font-size: 0.9rem;
+            font-weight: bold;
         }
         .zoom-btn:hover { background-color: var(--border-color); color: var(--text-main); }
 
@@ -173,27 +172,61 @@
         #prompt-container { display: flex; flex-direction: column; flex: 1; min-height: 0; }
         #prompt-text-area { height: 100%; min-height: 150px; }
 
+        /* IMAGE AREA (The Thumbnail View) */
         #prompt-image-area {
             display: none; 
             flex: 1;
             border: 2px dashed var(--border-color);
             border-radius: 4px;
-            align-items: flex-start; /* Align top for better zooming */
+            align-items: center;
             justify-content: center;
             background-color: var(--bg-panel);
             position: relative;
-            overflow: auto; /* Scrollbars appear here if image is zoomed */
+            overflow: hidden;
             min-height: 300px;
+            cursor: pointer; /* Indicates Clickable */
+            transition: border-color 0.2s;
         }
         
+        #prompt-image-area:hover { border-color: var(--accent-color); }
         #prompt-image-area.drag-over { background-color: var(--drag-bg); border-color: var(--accent-color); }
 
         #prompt-image-display {
-            width: 100%; /* Default 100% width */
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
             display: none;
-            transition: width 0.2s ease; /* Smooth zoom */
-            margin: auto; /* Center image */
+        }
+
+        /* OVERLAY / LIGHTBOX (Hidden by default) */
+        #lightbox-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85); /* Dark background */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #lightbox-image {
+            max-width: 95%;
+            max-height: 90%;
+            object-fit: contain;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border-radius: 4px;
+        }
+
+        #lightbox-msg {
+            color: #fff;
+            margin-top: 15px;
+            font-family: sans-serif;
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
 
         .upload-msg {
@@ -208,11 +241,15 @@
         body.mode-task1 #note-box-2 { display: none; }
 
         #essay-input { flex: 1; margin-bottom: 10px; transition: font-size 0.2s; }
-        
         #word-count-display { text-align: right; font-weight: bold; color: var(--text-muted); font-size: 0.9rem; }
     </style>
 </head>
 <body class="mode-task1">
+
+    <div id="lightbox-modal">
+        <img id="lightbox-image" src="" alt="Full Screen Chart">
+        <div id="lightbox-msg">Press ESC or Click to Close</div>
+    </div>
 
     <header>
         <div class="header-left">
@@ -243,15 +280,15 @@
             <div id="prompt-container">
                 <div class="panel-header">
                     <h3 id="prompt-label">Task 1 (Chart/Graph)</h3>
-                    <div class="zoom-controls">
-                        <button class="zoom-btn" onclick="zoomLeft(-1)">-</button>
-                        <button class="zoom-btn" onclick="zoomLeft(1)">+</button>
+                    <div class="zoom-controls" id="prompt-text-zoom" style="display:none;">
+                        <button class="zoom-btn" onclick="zoomText(-1)">A-</button>
+                        <button class="zoom-btn" onclick="zoomText(1)">A+</button>
                     </div>
                 </div>
                 
                 <textarea id="prompt-text-area" placeholder="Paste your essay question here..." style="display: none;"></textarea>
 
-                <div id="prompt-image-area" style="display: flex;">
+                <div id="prompt-image-area" style="display: flex;" title="Click to view full screen">
                     <div class="upload-msg">
                         <p><strong>Click or Paste (Ctrl+V)</strong></p>
                         <p>to upload Chart/Graph</p>
@@ -281,8 +318,8 @@
             <div class="panel-header">
                 <h3>Your Response</h3>
                 <div class="zoom-controls">
-                    <button class="zoom-btn" onclick="zoomRight(-1)">-</button>
-                    <button class="zoom-btn" onclick="zoomRight(1)">+</button>
+                    <button class="zoom-btn" onclick="zoomRight(-1)">A-</button>
+                    <button class="zoom-btn" onclick="zoomRight(1)">A+</button>
                 </div>
             </div>
             <textarea id="essay-input" placeholder="Start typing..." spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
@@ -311,6 +348,11 @@
         const fileInput = document.getElementById('file-input');
         const noteLabel1 = document.getElementById('notes-label-1');
         const noteBox2 = document.getElementById('note-box-2');
+        const promptTextZoom = document.getElementById('prompt-text-zoom');
+        
+        // Lightbox Elements
+        const lightboxModal = document.getElementById('lightbox-modal');
+        const lightboxImg = document.getElementById('lightbox-image');
 
         // --- STATE ---
         let totalTime = 20 * 60; 
@@ -320,29 +362,20 @@
         let isDarkMode = false;
         let currentMode = 'task1';
         
-        // ZOOM STATE
-        let leftZoom = 100; // Percentage
-        let rightZoom = 16; // Font size px
+        let leftTextSize = 16;
+        let rightTextSize = 16;
 
-        // --- ZOOM FUNCTIONS ---
-        function zoomLeft(direction) {
-            // Task 1: Zoom Image
-            if(currentMode === 'task1') {
-                leftZoom += (direction * 10);
-                if(leftZoom < 20) leftZoom = 20;
-                promptImgDisplay.style.width = leftZoom + "%";
-            } else {
-                // Task 2: Zoom Prompt Text
-                leftZoom += direction; // Reusing var for font size steps
-                if(leftZoom < 10) leftZoom = 10; 
-                promptText.style.fontSize = leftZoom + "px"; // Hacky reuse but works visually
-            }
+        // --- ZOOM FUNCTIONS (TEXT) ---
+        function zoomText(direction) {
+            leftTextSize += direction;
+            if(leftTextSize < 10) leftTextSize = 10; 
+            promptText.style.fontSize = leftTextSize + "px";
         }
 
         function zoomRight(direction) {
-            rightZoom += direction;
-            if(rightZoom < 10) rightZoom = 10;
-            essayInput.style.fontSize = rightZoom + "px";
+            rightTextSize += direction;
+            if(rightTextSize < 10) rightTextSize = 10;
+            essayInput.style.fontSize = rightTextSize + "px";
         }
 
         // --- TIMER ---
@@ -409,14 +442,10 @@
                 promptText.style.display = 'none';
                 promptImgArea.style.display = 'flex';
                 noteBox2.style.display = 'none';
+                promptTextZoom.style.display = 'none'; // Hide text zoom for image mode
                 
                 modeTask1.classList.add('active');
                 modeTask2.classList.remove('active');
-                
-                // Reset Zoom for Image context
-                leftZoom = 100; 
-                promptImgDisplay.style.width = "100%";
-
             } else {
                 body.classList.remove('mode-task1');
                 body.classList.add('mode-task2');
@@ -427,35 +456,50 @@
                 promptText.style.display = 'block';
                 promptImgArea.style.display = 'none';
                 noteBox2.style.display = 'flex';
+                promptTextZoom.style.display = 'flex'; // Show text zoom
                 
                 modeTask1.classList.remove('active');
                 modeTask2.classList.add('active');
-
-                // Reset Zoom for Text context
-                leftZoom = 16; 
-                promptText.style.fontSize = "16px";
             }
             restartTimer();
             updateWordCount();
         }
 
-        // --- IMAGE UPLOAD ---
+        // --- IMAGE HANDLING & LIGHTBOX ---
         function handleFile(file) {
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     promptImgDisplay.src = e.target.result;
                     promptImgDisplay.style.display = 'block';
+                    lightboxImg.src = e.target.result; // Update lightbox src too
                     uploadMsg.style.display = 'none';
-                    // Reset zoom on new image
-                    leftZoom = 100;
-                    promptImgDisplay.style.width = "100%";
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        promptImgArea.addEventListener('click', () => fileInput.click());
+        // Click Logic
+        promptImgArea.addEventListener('click', (e) => {
+            // If image exists, open Lightbox. If not, open File picker.
+            if(promptImgDisplay.style.display === 'block') {
+                lightboxModal.style.display = 'flex';
+            } else {
+                fileInput.click();
+            }
+        });
+
+        // Close Lightbox logic
+        lightboxModal.addEventListener('click', () => {
+            lightboxModal.style.display = 'none';
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape" && lightboxModal.style.display === 'flex') {
+                lightboxModal.style.display = 'none';
+            }
+        });
+
         fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
 
         window.addEventListener('paste', (e) => {
