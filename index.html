@@ -1,31 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IELTS Writing Simulator</title>
+    <link rel="manifest" href="manifest.json">
     <style>
         :root {
             /* --- REAL EXAM PALETTE --- */
-            --bg-body: #e8e8e8;       
-            --bg-panel: #ffffff;      
-            --text-main: #000000;     
-            --text-muted: #444444;    
-            --border-color: #cccccc;  
-            
+            --bg-body: #e8e8e8;
+            --bg-panel: #ffffff;
+            --text-main: #000000;
+            --text-muted: #444444;
+            --border-color: #cccccc;
+
             /* Functional Colors */
-            --primary: #2563eb;       
-            --primary-hover: #1d4ed8; 
-            --danger: #d32f2f;        
-            --warning: #f57c00;       
-            --success: #2e7d32;       
-            
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #d32f2f;
+            --warning: #f57c00;
+            --success: #2e7d32;
+
             --toggle-track: #e0e0e0;
             --toggle-active: #ffffff;
             --toggle-text: #555555;
             --toggle-text-active: #000000;
 
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         body.dark-mode {
@@ -39,14 +41,18 @@
             --danger: #ef4444;
             --warning: #fb923c;
             --success: #10b981;
-            
+
             --toggle-track: #0f172a;
             --toggle-active: #334155;
             --toggle-text: #94a3b8;
             --toggle-text-active: #f8fafc;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: Arial, Helvetica, sans-serif;
@@ -61,7 +67,7 @@
 
         /* --- HEADER --- */
         header {
-            height: 64px; 
+            height: 64px;
             background-color: var(--bg-panel);
             border-bottom: 1px solid var(--border-color);
             display: flex;
@@ -72,10 +78,25 @@
             z-index: 10;
         }
 
-        .header-group { display: flex; align-items: center; gap: 16px; } 
-        .header-left { width: 220px; }
-        .header-center { justify-content: center; flex: 1; }
-        .header-right { width: 220px; justify-content: flex-end; }
+        .header-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-left {
+            width: 220px;
+        }
+
+        .header-center {
+            justify-content: center;
+            flex: 1;
+        }
+
+        .header-right {
+            width: 220px;
+            justify-content: flex-end;
+        }
 
         /* SEGMENTED CONTROL */
         .task-toggle {
@@ -85,7 +106,7 @@
             border-radius: 6px;
             border: 1px solid var(--border-color);
         }
-        
+
         .task-btn {
             padding: 6px 16px;
             border: none;
@@ -97,7 +118,11 @@
             border-radius: 4px;
             transition: all 0.2s ease;
         }
-        .task-btn:hover { color: var(--text-main); }
+
+        .task-btn:hover {
+            color: var(--text-main);
+        }
+
         .task-btn.active {
             background: var(--toggle-active);
             color: var(--toggle-text-active);
@@ -107,101 +132,216 @@
 
         /* TIMER STYLES */
         #timer-display {
-            font-size: 1.8rem; font-weight: 800; color: var(--text-main);
-            font-variant-numeric: tabular-nums; min-width: 100px; text-align: center; letter-spacing: -1px;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+            min-width: 100px;
+            text-align: center;
+            letter-spacing: -1px;
             transition: color 0.3s;
         }
-        .timer-warning { color: var(--warning) !important; }
-        .timer-danger { color: var(--danger) !important; }
-        .timer-blink { animation: blinker 1s linear infinite; color: var(--danger) !important; }
-        @keyframes blinker { 50% { opacity: 0.3; } }
+
+        .timer-warning {
+            color: var(--warning) !important;
+        }
+
+        .timer-danger {
+            color: var(--danger) !important;
+        }
+
+        .timer-blink {
+            animation: blinker 1s linear infinite;
+            color: var(--danger) !important;
+        }
+
+        @keyframes blinker {
+            50% {
+                opacity: 0.3;
+            }
+        }
 
         /* BUTTONS */
         .btn {
-            height: 38px; 
-            padding: 0 14px; 
-            font-size: 0.95rem; 
+            height: 38px;
+            padding: 0 14px;
+            font-size: 0.95rem;
             cursor: pointer;
-            border: 1px solid var(--border-color); 
+            border: 1px solid var(--border-color);
             background-color: var(--bg-panel);
-            color: var(--text-main); 
-            border-radius: 6px; 
+            color: var(--text-main);
+            border-radius: 6px;
             font-weight: 600;
-            transition: all 0.15s ease; 
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             white-space: nowrap;
         }
-        .btn:hover { border-color: var(--text-muted); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-        .btn:active { transform: translateY(0); }
-        
-        .header-right .btn { font-size: 1.2rem; padding: 0 12px; } 
 
-        #btn-action { background-color: var(--primary); border-color: var(--primary); color: white; min-width: 80px; }
-        #btn-action:hover { background-color: var(--primary-hover); }
+        .btn:hover {
+            border-color: var(--text-muted);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .header-right .btn {
+            font-size: 1.2rem;
+            padding: 0 12px;
+        }
+
+        #btn-action {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            min-width: 80px;
+        }
+
+        #btn-action:hover {
+            background-color: var(--primary-hover);
+        }
 
         /* GITHUB LINK */
         .github-link {
-            display: flex; align-items: center; justify-content: center;
-            height: 38px; width: 38px; border-radius: 6px; transition: background 0.2s;
-            position: relative; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 38px;
+            width: 38px;
+            border-radius: 6px;
+            transition: background 0.2s;
+            position: relative;
             cursor: pointer;
-            text-decoration: none; 
+            text-decoration: none;
         }
-        .github-link:hover { background: var(--toggle-track); }
-        .github-link svg { width: 22px; height: 22px; fill: var(--text-muted); transition: fill 0.2s; }
-        .github-link:hover svg { fill: var(--text-main); }
+
+        .github-link:hover {
+            background: var(--toggle-track);
+        }
+
+        .github-link svg {
+            width: 22px;
+            height: 22px;
+            fill: var(--text-muted);
+            transition: fill 0.2s;
+        }
+
+        .github-link:hover svg {
+            fill: var(--text-main);
+        }
 
         .github-link::after {
-            content: "⭐ Consider a star?"; 
-            position: absolute; 
-            top: 120%; right: 0;
-            background: var(--bg-panel); 
-            color: var(--text-main); 
+            content: "⭐ Consider a star?";
+            position: absolute;
+            top: 120%;
+            right: 0;
+            background: var(--bg-panel);
+            color: var(--text-main);
             border: 1px solid var(--border-color);
-            padding: 8px 12px; 
-            border-radius: 6px; 
-            font-size: 0.8rem; font-weight: 600;
-            white-space: nowrap; 
-            opacity: 0; pointer-events: none; 
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
             transform: translateY(-5px);
-            transition: all 0.2s ease; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15); 
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             z-index: 9999;
         }
-        .github-link:hover::after { opacity: 1; transform: translateY(0); }
+
+        .github-link:hover::after {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         /* MAIN LAYOUT */
-        main { display: flex; flex: 1; overflow: hidden; padding: 16px; gap: 0; }
+        main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            padding: 16px;
+            gap: 0;
+        }
 
         .panel {
-            background: var(--bg-panel); border-radius: 8px;
+            background: var(--bg-panel);
+            border-radius: 8px;
             border: 1px solid var(--border-color);
-            padding: 16px; display: flex; flex-direction: column; overflow-y: auto;
-            box-shadow: var(--shadow-sm); 
-            min-width: 200px; 
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-shadow: var(--shadow-sm);
+            min-width: 200px;
         }
-        
+
         .resizer {
-            width: 12px; cursor: col-resize; display: flex; justify-content: center; align-items: center;
-            flex-shrink: 0; transition: background 0.2s; margin: 0 4px; border-radius: 4px;
+            width: 12px;
+            cursor: col-resize;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            transition: background 0.2s;
+            margin: 0 4px;
+            border-radius: 4px;
         }
-        .resizer:hover, .resizer.resizing { background: var(--toggle-track); }
-        .resizer::after { content: ""; width: 2px; height: 24px; background: var(--border-color); border-radius: 1px; }
+
+        .resizer:hover,
+        .resizer.resizing {
+            background: var(--toggle-track);
+        }
+
+        .resizer::after {
+            content: "";
+            width: 2px;
+            height: 24px;
+            background: var(--border-color);
+            border-radius: 1px;
+        }
 
         /* PANEL HEADERS */
         .panel-header {
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 10px; 
-            flex-shrink: 0; border-bottom: 1px solid var(--border-color); 
-            padding-bottom: 8px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
         }
-        h3 { margin: 0; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
 
-        .controls-group { display: flex; gap: 12px; align-items: center; } 
-        
-        .icon-btn { 
-            padding: 0; width: 32px; height: 32px; 
-            font-size: 1.2rem; display: flex; align-items: center; justify-content: center; padding-bottom: 3px;
+        h3 {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .controls-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 3px;
         }
 
         /* BEAUTIFIED DROPDOWN */
@@ -227,89 +367,289 @@
             background-size: 8px;
             padding-right: 24px;
         }
+
         body.dark-mode .styled-select {
             background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
         }
-        .styled-select:hover { border-color: var(--text-muted); }
-        .styled-select:focus { border-color: var(--primary); }
+
+        .styled-select:hover {
+            border-color: var(--text-muted);
+        }
+
+        .styled-select:focus {
+            border-color: var(--primary);
+        }
 
         textarea {
-            width: 100%; border: 1px solid var(--border-color); border-radius: 6px; padding: 16px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
             font-family: Arial, Helvetica, sans-serif;
-            font-size: 1rem; line-height: 1.6; resize: none; background-color: var(--bg-panel);
-            color: var(--text-main); outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: none;
+            background-color: var(--bg-panel);
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
 
-        #prompt-container { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-        #prompt-text-area { height: 100%; min-height: 150px; }
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        #prompt-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
+        #prompt-text-area {
+            height: 100%;
+            min-height: 150px;
+        }
 
         /* IMAGE AREA */
         #prompt-image-area {
-            display: none; flex: 1; border: 2px dashed var(--border-color); border-radius: 8px;
-            align-items: center; justify-content: center; background-color: var(--bg-body);
-            position: relative; overflow: hidden; min-height: 300px; cursor: zoom-in; transition: all 0.2s;
+            display: none;
+            flex: 1;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-body);
+            position: relative;
+            overflow: hidden;
+            min-height: 300px;
+            cursor: zoom-in;
+            transition: all 0.2s;
         }
-        #prompt-image-area:hover { border-color: var(--primary); background-color: rgba(37, 99, 235, 0.02); }
-        #prompt-image-display { max-width: 100%; max-height: 100%; object-fit: contain; display: none; }
-        
+
+        #prompt-image-area:hover {
+            border-color: var(--primary);
+            background-color: rgba(37, 99, 235, 0.02);
+        }
+
+        #prompt-image-display {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
         #btn-remove-img {
-            position: absolute; top: 10px; right: 10px; width: 32px; height: 32px;
-            background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%;
-            cursor: pointer; display: none; align-items: center; justify-content: center;
-            font-size: 18px; z-index: 5; transition: background 0.2s;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            z-index: 5;
+            transition: background 0.2s;
         }
-        #btn-remove-img:hover { background: var(--danger); }
+
+        #btn-remove-img:hover {
+            background: var(--danger);
+        }
 
         /* PLANNING & FOOTER */
-        .planning-section { display: flex; flex-direction: column; min-height: 150px; margin-top: 16px; }
-        .planning-grid { display: flex; gap: 16px; flex: 1; }
-        .plan-box { flex: 1; display: flex; flex-direction: column; }
-        
-        .plan-box .panel-header { display: none; }
-        .plan-box textarea { flex: 1; font-size: 0.9rem; height: 100%; }
-
-        body.mode-task1 #note-box-2 { display: none; }
-
-        #essay-input { flex: 1; margin-bottom: 0; }
-        
-        #footer-bar { 
-            display: flex; justify-content: flex-end; align-items: center; 
-            margin-top: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); 
-            opacity: 0; transition: opacity 0.2s ease;
+        .planning-section {
+            display: flex;
+            flex-direction: column;
+            min-height: 150px;
+            margin-top: 16px;
         }
-        #footer-bar.visible { opacity: 1; }
+
+        .planning-grid {
+            display: flex;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .plan-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .plan-box .panel-header {
+            display: none;
+        }
+
+        .plan-box textarea {
+            flex: 1;
+            font-size: 0.9rem;
+            height: 100%;
+        }
+
+        body.mode-task1 #note-box-2 {
+            display: none;
+        }
+
+        #essay-input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        #footer-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        #footer-bar.visible {
+            opacity: 1;
+        }
 
         /* LIGHTBOX */
         #lightbox-modal {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(15, 23, 42, 0.95); backdrop-filter: blur(4px);
-            justify-content: center; align-items: center; flex-direction: column; animation: fadeIn 0.2s ease-out;
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: fadeIn 0.2s ease-out;
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        #lightbox-image { max-width: 90%; max-height: 85%; object-fit: contain; border-radius: 4px; }
-        #lightbox-msg { color: #94a3b8; margin-top: 20px; font-family: sans-serif; font-size: 0.9rem; background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px; }
-        .upload-msg { text-align: center; color: var(--text-muted); pointer-events: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .upload-msg strong { color: var(--primary); }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        #lightbox-image {
+            max-width: 90%;
+            max-height: 85%;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        #lightbox-msg {
+            color: #94a3b8;
+            margin-top: 20px;
+            font-family: sans-serif;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .upload-msg {
+            text-align: center;
+            color: var(--text-muted);
+            pointer-events: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .upload-msg strong {
+            color: var(--primary);
+        }
 
         /* PRINT STYLES */
-        #print-container { display: none; }
+        #print-container {
+            display: none;
+        }
+
         @media print {
-            body { background: white; color: black; height: auto; overflow: visible; display: block; }
-            header, .resizer, .planning-section, #lightbox-modal, .upload-msg, #btn-remove-img { display: none !important; }
-            main { display: none; }
-            #print-container { 
-                display: block; padding: 40px; max-width: 800px; margin: 0 auto; 
-                font-family: 'Times New Roman', serif; 
+            body {
+                background: white;
+                color: black;
+                height: auto;
+                overflow: visible;
+                display: block;
             }
-            .print-task { margin-bottom: 50px; page-break-inside: avoid; }
-            .print-title { font-size: 1.5rem; border-bottom: 2px solid #000; margin-bottom: 20px; font-weight: bold; }
-            .print-label { font-weight: bold; margin-bottom: 10px; text-transform: uppercase; font-size: 0.9rem; color: #555; }
-            .print-content { white-space: pre-wrap; font-size: 1.1rem; line-height: 1.6; text-align: justify; margin-bottom: 20px; }
-            .print-img { max-width: 100%; max-height: 400px; border: 1px solid #ccc; margin-bottom: 20px; display: block; }
+
+            header,
+            .resizer,
+            .planning-section,
+            #lightbox-modal,
+            .upload-msg,
+            #btn-remove-img {
+                display: none !important;
+            }
+
+            main {
+                display: none;
+            }
+
+            #print-container {
+                display: block;
+                padding: 40px;
+                max-width: 800px;
+                margin: 0 auto;
+                font-family: 'Times New Roman', serif;
+            }
+
+            .print-task {
+                margin-bottom: 50px;
+                page-break-inside: avoid;
+            }
+
+            .print-title {
+                font-size: 1.5rem;
+                border-bottom: 2px solid #000;
+                margin-bottom: 20px;
+                font-weight: bold;
+            }
+
+            .print-label {
+                font-weight: bold;
+                margin-bottom: 10px;
+                text-transform: uppercase;
+                font-size: 0.9rem;
+                color: #555;
+            }
+
+            .print-content {
+                white-space: pre-wrap;
+                font-size: 1.1rem;
+                line-height: 1.6;
+                text-align: justify;
+                margin-bottom: 20px;
+            }
+
+            .print-img {
+                max-width: 100%;
+                max-height: 400px;
+                border: 1px solid #ccc;
+                margin-bottom: 20px;
+                display: block;
+            }
         }
     </style>
 </head>
+
 <body class="mode-task1 dark-mode">
 
     <div id="print-container"></div>
@@ -337,9 +677,13 @@
             <button class="btn" id="btn-copy" title="Copy">📋</button>
             <button class="btn" id="btn-print" title="Download PDF">📥</button>
             <button class="btn" id="theme-toggle" title="Toggle Theme">☀️</button>
-            
+
             <a href="https://github.com/spideyonmoon/ielts-writing-simulator" target="_blank" class="github-link">
-                <svg viewBox="0 0 16 16" version="1.1" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+                <svg viewBox="0 0 16 16" version="1.1" aria-hidden="true">
+                    <path fill-rule="evenodd"
+                        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+                    </path>
+                </svg>
             </a>
         </div>
     </header>
@@ -359,16 +703,18 @@
                             <option value="problem_solution">Problem/Solution</option>
                         </select>
 
-                        <button class="btn" id="btn-random" style="display:none; font-size: 1.2rem; padding: 0 10px;">🎲</button>
-                        
+                        <button class="btn" id="btn-random"
+                            style="display:none; font-size: 1.2rem; padding: 0 10px;">🎲</button>
+
                         <div class="controls-group" id="prompt-text-zoom" style="display:none;">
                             <button class="btn icon-btn" onclick="zoomText(-1)">-</button>
                             <button class="btn icon-btn" onclick="zoomText(1)">+</button>
                         </div>
                     </div>
                 </div>
-                
-                <textarea id="prompt-text-area" placeholder="Paste your essay question here..." style="display: none;"></textarea>
+
+                <textarea id="prompt-text-area" placeholder="Paste your essay question here..."
+                    style="display: none;"></textarea>
 
                 <div id="prompt-image-area" style="display: flex;" title="Click to view full screen">
                     <button id="btn-remove-img" title="Remove Image">×</button>
@@ -401,10 +747,12 @@
                 <div class="controls-group">
                     <button class="btn icon-btn" onclick="zoomRight(-1)">-</button>
                     <button class="btn icon-btn" onclick="zoomRight(1)">+</button>
-                    <button class="btn icon-btn" id="btn-clear" title="Clear Text" style="color: var(--danger); font-size: 1.2rem;">🧹</button>
+                    <button class="btn icon-btn" id="btn-clear" title="Clear Text"
+                        style="color: var(--danger); font-size: 1.2rem;">🧹</button>
                 </div>
             </div>
-            <textarea id="essay-input" placeholder="Start typing..." spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+            <textarea id="essay-input" placeholder="Start typing..." spellcheck="false" autocomplete="off"
+                autocorrect="off" autocapitalize="off"></textarea>
             <div id="footer-bar">
                 <span id="word-count-display">Words: 0</span>
             </div>
@@ -415,7 +763,7 @@
         // --- ELEMENTS ---
         const body = document.body;
         const timerDisplay = document.getElementById('timer-display');
-        const btnAction = document.getElementById('btn-action'); 
+        const btnAction = document.getElementById('btn-action');
         const btnReset = document.getElementById('btn-reset');
         const btnPrint = document.getElementById('btn-print');
         const btnCopy = document.getElementById('btn-copy');
@@ -432,23 +780,23 @@
         const promptText = document.getElementById('prompt-text-area');
         const promptImgArea = document.getElementById('prompt-image-area');
         const promptImgDisplay = document.getElementById('prompt-image-display');
-        const btnRemoveImg = document.getElementById('btn-remove-img'); 
+        const btnRemoveImg = document.getElementById('btn-remove-img');
         const uploadMsg = document.querySelector('.upload-msg');
         const fileInput = document.getElementById('file-input');
         const noteBox1 = document.getElementById('notes-1');
-        const noteBox2 = document.getElementById('notes-2'); 
-        const noteBox2Container = document.getElementById('note-box-2'); 
+        const noteBox2 = document.getElementById('notes-2');
+        const noteBox2Container = document.getElementById('note-box-2');
         const promptTextZoom = document.getElementById('prompt-text-zoom');
         const lightboxModal = document.getElementById('lightbox-modal');
         const lightboxImg = document.getElementById('lightbox-image');
         const printContainer = document.getElementById('print-container');
-        
+
         const resizer = document.getElementById('drag-handle');
         const panelLeft = document.getElementById('panel-left');
         const panelRight = document.getElementById('panel-right');
 
         // --- STATE ---
-        let totalTime = 20 * 60; 
+        let totalTime = 20 * 60;
         let currentTime = totalTime;
         let timerInterval = null;
         let isRunning = false;
@@ -456,10 +804,10 @@
         let currentMode = 'task1';
         let leftTextSize = 16;
         let rightTextSize = 16;
-        let task2Data = null; 
-        let task1Data = null; 
+        let task2Data = null;
+        let task1Data = null;
         let cambridgeData = null; // New Cambridge data storage
-        
+
         const KEY_T1_RESP = 'ielts_t1_resp';
         const KEY_T2_RESP = 'ielts_t2_resp';
         const KEY_T2_PROMPT = 'ielts_t2_prompt';
@@ -473,12 +821,12 @@
 
         // --- LOCAL STORAGE MANAGER ---
         function loadState() {
-            if(localStorage.getItem(KEY_T1_RESP)) task1Response = localStorage.getItem(KEY_T1_RESP);
-            if(localStorage.getItem(KEY_T2_RESP)) task2Response = localStorage.getItem(KEY_T2_RESP);
-            if(localStorage.getItem(KEY_T2_PROMPT)) promptText.value = localStorage.getItem(KEY_T2_PROMPT);
-            
+            if (localStorage.getItem(KEY_T1_RESP)) task1Response = localStorage.getItem(KEY_T1_RESP);
+            if (localStorage.getItem(KEY_T2_RESP)) task2Response = localStorage.getItem(KEY_T2_RESP);
+            if (localStorage.getItem(KEY_T2_PROMPT)) promptText.value = localStorage.getItem(KEY_T2_PROMPT);
+
             const savedImg = localStorage.getItem(KEY_T1_IMG);
-            if(savedImg) {
+            if (savedImg) {
                 promptImgDisplay.src = savedImg;
                 promptImgDisplay.style.display = 'block';
                 lightboxImg.src = savedImg;
@@ -491,7 +839,7 @@
         }
 
         function saveCurrentWork() {
-            if(currentMode === 'task1') {
+            if (currentMode === 'task1') {
                 task1Response = essayInput.value;
                 localStorage.setItem(KEY_T1_RESP, task1Response);
             } else {
@@ -528,17 +876,17 @@
             const s = seconds % 60;
             return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
         }
-        
+
         function updateTimerVisuals() {
-            timerDisplay.className = ''; 
-            if(currentMode === 'task1') {
-                if(currentTime <= 60) timerDisplay.classList.add('timer-blink');
-                else if(currentTime <= 120) timerDisplay.classList.add('timer-danger');
-                else if(currentTime <= 240) timerDisplay.classList.add('timer-warning');
+            timerDisplay.className = '';
+            if (currentMode === 'task1') {
+                if (currentTime <= 60) timerDisplay.classList.add('timer-blink');
+                else if (currentTime <= 120) timerDisplay.classList.add('timer-danger');
+                else if (currentTime <= 240) timerDisplay.classList.add('timer-warning');
             } else {
-                if(currentTime <= 60) timerDisplay.classList.add('timer-blink');
-                else if(currentTime <= 120) timerDisplay.classList.add('timer-danger');
-                else if(currentTime <= 300) timerDisplay.classList.add('timer-warning');
+                if (currentTime <= 60) timerDisplay.classList.add('timer-blink');
+                else if (currentTime <= 120) timerDisplay.classList.add('timer-danger');
+                else if (currentTime <= 300) timerDisplay.classList.add('timer-warning');
             }
         }
 
@@ -552,9 +900,9 @@
                 clearInterval(timerInterval);
                 isRunning = false;
                 btnAction.textContent = "Resume";
-                if(document.exitFullscreen) document.exitFullscreen().catch(e => {}); 
+                if (document.exitFullscreen) document.exitFullscreen().catch(e => { });
             } else {
-                if(currentTime <= 0) return;
+                if (currentTime <= 0) return;
                 if (document.documentElement.requestFullscreen) {
                     document.documentElement.requestFullscreen().catch(err => {
                         console.log(`Error attempting to enable full-screen mode: ${err.message}`);
@@ -586,42 +934,42 @@
         // --- MODE SWITCHING ---
         function setMode(mode, initialLoad = false) {
             // Silently pause timer if running
-            if(isRunning && !initialLoad) {
-                toggleTimer(); 
+            if (isRunning && !initialLoad) {
+                toggleTimer();
             }
             if (!initialLoad) saveCurrentWork();
 
             currentMode = mode;
-            
+
             if (mode === 'task1') {
                 body.classList.remove('mode-task2'); body.classList.add('mode-task1');
                 totalTime = 20 * 60;
-                promptLabel.textContent = "Question"; 
-                
+                promptLabel.textContent = "Question";
+
                 promptText.style.display = 'none';
                 promptImgArea.style.display = 'flex';
                 noteBox2Container.style.display = 'none';
                 promptTextZoom.style.display = 'none';
                 modeTask1.classList.add('active'); modeTask2.classList.remove('active');
-                
+
                 btnRandom.style.display = 'none';
                 typeSelect.style.display = 'none';
 
                 noteBox1.placeholder = "Write notes here...";
-                
+
                 essayInput.value = task1Response;
-                
+
             } else {
                 body.classList.remove('mode-task1'); body.classList.add('mode-task2');
                 totalTime = 40 * 60;
-                promptLabel.textContent = "Question"; 
-                
+                promptLabel.textContent = "Question";
+
                 promptText.style.display = 'block';
                 promptImgArea.style.display = 'none';
                 noteBox2Container.style.display = 'flex';
                 promptTextZoom.style.display = 'flex';
                 modeTask1.classList.remove('active'); modeTask2.classList.add('active');
-                
+
                 btnRandom.style.display = 'flex';
                 typeSelect.style.display = 'block';
 
@@ -630,8 +978,8 @@
 
                 essayInput.value = task2Response;
             }
-            
-            if(!initialLoad) resetTimer(); 
+
+            if (!initialLoad) resetTimer();
             updateWordCount();
         }
 
@@ -641,33 +989,33 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const result = e.target.result;
-                    if(result.length > 4000000) { 
+                    if (result.length > 4000000) {
                         alert("Image is very large and might not save to LocalStorage.");
                     }
                     promptImgDisplay.src = result;
                     promptImgDisplay.style.display = 'block';
                     lightboxImg.src = result;
                     uploadMsg.style.display = 'none';
-                    btnRemoveImg.style.display = 'flex'; 
+                    btnRemoveImg.style.display = 'flex';
                     savedTask1Image = result;
                     localStorage.setItem(KEY_T1_IMG, result);
                 };
                 reader.readAsDataURL(file);
             }
         }
-        
+
         promptImgArea.addEventListener('click', (e) => {
             if (e.target === btnRemoveImg) return;
-            if(promptImgDisplay.style.display === 'block') lightboxModal.style.display = 'flex';
+            if (promptImgDisplay.style.display === 'block') lightboxModal.style.display = 'flex';
             else fileInput.click();
         });
-        
+
         btnRemoveImg.addEventListener('click', (e) => {
-            e.stopPropagation(); 
+            e.stopPropagation();
             promptImgDisplay.src = '';
             promptImgDisplay.style.display = 'none';
             uploadMsg.style.display = 'block';
-            fileInput.value = ''; 
+            fileInput.value = '';
             btnRemoveImg.style.display = 'none';
             savedTask1Image = "";
             localStorage.removeItem(KEY_T1_IMG);
@@ -676,7 +1024,7 @@
         lightboxModal.addEventListener('click', () => lightboxModal.style.display = 'none');
         document.addEventListener('keydown', (e) => { if (e.key === "Escape") lightboxModal.style.display = 'none'; });
         fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
-        
+
         window.addEventListener('paste', (e) => {
             if (currentMode === 'task1') {
                 const items = (e.clipboardData || e.originalEvent.clipboardData).items;
@@ -700,9 +1048,9 @@
             if (!isResizing) return;
             const containerWidth = document.querySelector('main').offsetWidth;
             let newFlexLeft = (e.clientX / containerWidth) * 10;
-            if(newFlexLeft < 2) newFlexLeft = 2;
-            if(newFlexLeft > 8) newFlexLeft = 8;
-            
+            if (newFlexLeft < 2) newFlexLeft = 2;
+            if (newFlexLeft > 8) newFlexLeft = 8;
+
             let newFlexRight = 10 - newFlexLeft;
             panelLeft.style.flex = newFlexLeft;
             panelRight.style.flex = newFlexRight;
@@ -718,7 +1066,7 @@
         function updateWordCount() {
             const text = essayInput.value.trim();
             const count = text === '' ? 0 : text.split(/\s+/).length;
-            
+
             if (count === 0) {
                 footerBar.classList.remove('visible');
             } else {
@@ -727,18 +1075,18 @@
 
             let color = 'var(--text-muted)';
             const limit = currentMode === 'task1' ? 150 : 250;
-            if (count > 0 && count < limit) color = 'var(--danger)'; 
+            if (count > 0 && count < limit) color = 'var(--danger)';
             if (count >= limit) color = 'var(--success)';
             wordCountDisplay.textContent = `Words: ${count}`;
             wordCountDisplay.style.color = color;
         }
-        
+
         function toggleTheme() {
             isDarkMode = !isDarkMode;
             body.classList.toggle('dark-mode');
             themeToggle.innerHTML = isDarkMode ? "☀️" : "🌙";
         }
-        
+
         // --- PRINT TO PDF ---
         function handlePrint() {
             saveCurrentWork();
@@ -770,7 +1118,7 @@
         // --- COPY FUNCTION ---
         function copyToClipboard() {
             let textToCopy = "";
-            if(currentMode === 'task1') textToCopy = essayInput.value;
+            if (currentMode === 'task1') textToCopy = essayInput.value;
             else {
                 const prompt = promptText.value;
                 textToCopy = `PROMPT:\n${prompt}\n\nRESPONSE:\n${essayInput.value}`;
@@ -785,8 +1133,8 @@
         // --- FETCH RANDOM PROMPT ---
         async function loadRandomPrompt() {
             // No confirmation logic
-            if(promptText.value.trim() !== "" && !confirm("This will replace your current prompt. Continue?")) return;
-            
+            if (promptText.value.trim() !== "" && !confirm("This will replace your current prompt. Continue?")) return;
+
             const btn = document.getElementById('btn-random');
             btn.disabled = true;
             const originalText = btn.textContent;
@@ -799,7 +1147,6 @@
                     // --- CAMBRIDGE MODE ---
                     if (selectedType === 'cambridge') {
                         if (!cambridgeData) {
-                            // FETCHING THE NEW FILE
                             const response = await fetch('t2_promptset_2.json');
                             if (!response.ok) throw new Error("Cambridge file not found");
                             cambridgeData = await response.json();
@@ -810,7 +1157,7 @@
                             promptText.value = item.text;
                             localStorage.setItem(KEY_T2_PROMPT, item.text);
                         }
-                    } 
+                    }
                     // --- STANDARD MODE ---
                     else {
                         if (!task2Data) {
@@ -828,7 +1175,7 @@
                             } else {
                                 const randomIndex = Math.floor(Math.random() * filteredList.length);
                                 const item = filteredList[randomIndex];
-                                promptText.value = item.text; 
+                                promptText.value = item.text;
                                 localStorage.setItem(KEY_T2_PROMPT, item.text);
                             }
                         }
@@ -862,8 +1209,8 @@
         }
 
         // --- LISTENERS ---
-        btnAction.addEventListener('click', toggleTimer); 
-        btnReset.addEventListener('click', resetTimer);   
+        btnAction.addEventListener('click', toggleTimer);
+        btnReset.addEventListener('click', resetTimer);
         modeTask1.addEventListener('click', () => setMode('task1'));
         modeTask2.addEventListener('click', () => setMode('task2'));
         themeToggle.addEventListener('click', toggleTheme);
@@ -871,17 +1218,28 @@
         btnCopy.addEventListener('click', copyToClipboard);
         btnClear.addEventListener('click', clearCurrentTask);
         btnRandom.addEventListener('click', loadRandomPrompt);
-        
+
         essayInput.addEventListener('input', () => {
             updateWordCount();
             saveCurrentWork();
         });
-        
+
         promptText.addEventListener('input', () => {
-             if(currentMode === 'task2') localStorage.setItem(KEY_T2_PROMPT, promptText.value);
+            if (currentMode === 'task2') localStorage.setItem(KEY_T2_PROMPT, promptText.value);
         });
 
+
         updateTimerDisplay();
+
+        // --- PWA SERVICE WORKER REGISTRATION ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker Registered!', reg))
+                    .catch(err => console.log('Service Worker registration failed: ', err));
+            });
+        }
     </script>
 </body>
+
 </html>
