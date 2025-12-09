@@ -6,27 +6,30 @@
     <title>IELTS Writing Simulator</title>
     <style>
         :root {
-            /* --- MODERN PALETTE --- */
-            --bg-body: #f1f5f9;       
-            --bg-panel: #ffffff;      
-            --text-main: #0f172a;     
-            --text-muted: #64748b;    
-            --border-color: #e2e8f0;  
+            /* --- REAL EXAM PALETTE (SIMULATION) --- */
+            --bg-body: #e8e8e8;       /* The classic "Software Grey" */
+            --bg-panel: #ffffff;      /* Stark White Paper */
+            --text-main: #000000;     /* Pure Black (High Contrast) */
+            --text-muted: #444444;    /* Standard Grey */
+            --border-color: #cccccc;  /* Standard Windows-like Border */
+            
+            /* Functional Colors */
             --primary: #2563eb;       
             --primary-hover: #1d4ed8; 
-            --danger: #ef4444;
-            --success: #10b981;
+            --danger: #d32f2f;        /* Standard Red */
+            --success: #2e7d32;       /* Standard Green */
             
             /* Toggle Switch Specifics */
-            --toggle-track: #e2e8f0;
+            --toggle-track: #e0e0e0;
             --toggle-active: #ffffff;
-            --toggle-text: #64748b;
-            --toggle-text-active: #0f172a;
+            --toggle-text: #555555;
+            --toggle-text-active: #000000;
 
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1); /* Subtler shadow */
         }
 
         body.dark-mode {
+            /* Your preferred "Owl" Dark Mode (Unchanged) */
             --bg-body: #0f172a;
             --bg-panel: #1e293b;
             --text-main: #f8fafc;
@@ -34,6 +37,8 @@
             --border-color: #334155;
             --primary: #60a5fa;
             --primary-hover: #3b82f6;
+            --danger: #ef4444;
+            --success: #10b981;
             
             --toggle-track: #0f172a;
             --toggle-active: #334155;
@@ -44,7 +49,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif; /* Enforcing Arial for Exam Feel */
             background-color: var(--bg-body);
             color: var(--text-main);
             height: 100vh;
@@ -153,7 +158,8 @@
         main { display: flex; flex: 1; overflow: hidden; padding: 16px; gap: 16px; }
 
         .panel {
-            background: var(--bg-panel); border-radius: 12px; border: 1px solid var(--border-color);
+            background: var(--bg-panel); border-radius: 8px; /* Slightly squarer for realism */
+            border: 1px solid var(--border-color);
             padding: 20px; display: flex; flex-direction: column; overflow-y: auto;
             box-shadow: var(--shadow-sm); transition: flex 0.3s ease;
         }
@@ -165,7 +171,7 @@
 
         .zoom-controls { display: flex; gap: 6px; }
         .zoom-btn {
-            background: var(--bg-body); border: none; color: var(--text-muted);
+            background: var(--bg-body); border: 1px solid var(--border-color); color: var(--text-muted);
             width: 28px; height: 28px; border-radius: 4px; cursor: pointer;
             display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;
             transition: all 0.2s;
@@ -176,8 +182,8 @@
         body.mode-task1 .panel-left { flex: 5; } body.mode-task1 .panel-right { flex: 5; }
 
         textarea {
-            width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            width: 100%; border: 1px solid var(--border-color); border-radius: 6px; padding: 16px;
+            font-family: Arial, Helvetica, sans-serif;
             font-size: 1rem; line-height: 1.6; resize: none; background-color: var(--bg-panel);
             color: var(--text-main); outline: none; transition: border-color 0.2s, box-shadow 0.2s;
         }
@@ -331,7 +337,7 @@
         const promptText = document.getElementById('prompt-text-area');
         const promptImgArea = document.getElementById('prompt-image-area');
         const promptImgDisplay = document.getElementById('prompt-image-display');
-        const btnRemoveImg = document.getElementById('btn-remove-img'); // REMOVE BUTTON
+        const btnRemoveImg = document.getElementById('btn-remove-img'); 
         const uploadMsg = document.querySelector('.upload-msg');
         const fileInput = document.getElementById('file-input');
         const noteLabel1 = document.getElementById('notes-label-1');
@@ -463,23 +469,20 @@
                     promptImgDisplay.style.display = 'block';
                     lightboxImg.src = e.target.result;
                     uploadMsg.style.display = 'none';
-                    btnRemoveImg.style.display = 'flex'; // Show remove button
+                    btnRemoveImg.style.display = 'flex'; 
                 };
                 reader.readAsDataURL(file);
             }
         }
         
         promptImgArea.addEventListener('click', (e) => {
-            // Prevent triggering lightbox if we click the remove button
             if (e.target === btnRemoveImg) return;
-            
             if(promptImgDisplay.style.display === 'block') lightboxModal.style.display = 'flex';
             else fileInput.click();
         });
         
-        // Remove Image Logic
         btnRemoveImg.addEventListener('click', (e) => {
-            e.stopPropagation(); // Stop click from bubbling to promptImgArea
+            e.stopPropagation(); 
             promptImgDisplay.src = '';
             promptImgDisplay.style.display = 'none';
             uploadMsg.style.display = 'block';
@@ -509,7 +512,7 @@
             const count = text === '' ? 0 : text.split(/\s+/).length;
             let color = 'var(--text-muted)';
             const limit = currentMode === 'task1' ? 150 : 250;
-            if (count > 0 && count < limit) color = 'var(--warning)'; 
+            if (count > 0 && count < limit) color = 'var(--danger)'; 
             if (count >= limit) color = 'var(--success)';
             wordCountDisplay.textContent = `Words: ${count}`;
             wordCountDisplay.style.color = color;
