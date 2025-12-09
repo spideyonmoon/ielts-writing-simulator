@@ -284,9 +284,13 @@
             <div id="prompt-container">
                 <div class="panel-header">
                     <h3 id="prompt-label">Task 1 (Chart/Graph)</h3>
-                    <div class="controls-group" id="prompt-text-zoom" style="display:none;">
-                        <button class="btn icon-btn" onclick="zoomText(-1)">A-</button>
-                        <button class="btn icon-btn" onclick="zoomText(1)">A+</button>
+                    <div class="controls-group">
+                        <button class="btn" id="btn-random" style="display:none; margin-right: 8px; font-size: 0.8rem; padding: 0 10px;">🎲 Random</button>
+                        
+                        <div class="controls-group" id="prompt-text-zoom" style="display:none;">
+                            <button class="btn icon-btn" onclick="zoomText(-1)">A-</button>
+                            <button class="btn icon-btn" onclick="zoomText(1)">A+</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -345,6 +349,7 @@
         const btnPrint = document.getElementById('btn-print');
         const btnCopy = document.getElementById('btn-copy');
         const btnClear = document.getElementById('btn-clear');
+        const btnRandom = document.getElementById('btn-random'); // NEW
         const themeToggle = document.getElementById('theme-toggle');
         const essayInput = document.getElementById('essay-input');
         const wordCountDisplay = document.getElementById('word-count-display');
@@ -378,6 +383,7 @@
         let currentMode = 'task1';
         let leftTextSize = 16;
         let rightTextSize = 16;
+        let task2Data = null; // Store fetched prompts
         
         // --- STORAGE KEYS ---
         const KEY_T1_RESP = 'ielts_t1_resp';
@@ -544,6 +550,9 @@
                 promptTextZoom.style.display = 'none';
                 modeTask1.classList.add('active'); modeTask2.classList.remove('active');
                 
+                // HIDE RANDOM BUTTON
+                btnRandom.style.display = 'none';
+
                 essayInput.value = task1Response;
                 
             } else {
@@ -557,6 +566,9 @@
                 promptTextZoom.style.display = 'flex';
                 modeTask1.classList.remove('active'); modeTask2.classList.add('active');
                 
+                // SHOW RANDOM BUTTON
+                btnRandom.style.display = 'flex';
+
                 essayInput.value = task2Response;
             }
             
@@ -733,6 +745,46 @@
             });
         }
 
+        // --- FETCH RANDOM PROMPT (TASK 2) ---
+        async function loadRandomPrompt() {
+            if (currentMode !== 'task2') return;
+
+            if(promptText.value.trim() !== "" && !confirm("This will replace your current prompt. Continue?")) return;
+            
+            const btn = document.getElementById('btn-random');
+            
+            // Fetch Data if we don't have it yet
+            if (!task2Data) {
+                btn.textContent = "⏳ Loading...";
+                btn.disabled = true;
+                try {
+                    // Fetch from local file (works on GitHub Pages)
+                    const response = await fetch('task2_prompts.json');
+                    if (!response.ok) throw new Error("File not found");
+                    task2Data = await response.json();
+                } catch (error) {
+                    alert("Could not load prompts! (Note: This feature works on the live GitHub site, not offline file).");
+                    console.error(error);
+                    btn.textContent = "🎲 Random";
+                    btn.disabled = false;
+                    return;
+                }
+            }
+
+            // Pick Random Question
+            if (task2Data && task2Data.length > 0) {
+                const randomIndex = Math.floor(Math.random() * task2Data.length);
+                const selectedPrompt = task2Data[randomIndex];
+                
+                // Update UI
+                promptText.value = selectedPrompt;
+                localStorage.setItem(KEY_T2_PROMPT, selectedPrompt);
+            }
+            
+            btn.textContent = "🎲 Random";
+            btn.disabled = false;
+        }
+
         // --- LISTENERS ---
         btnAction.addEventListener('click', toggleTimer); 
         btnReset.addEventListener('click', resetTimer);   
@@ -744,6 +796,7 @@
         btnPrint.addEventListener('click', handlePrint);
         btnCopy.addEventListener('click', copyToClipboard);
         btnClear.addEventListener('click', clearCurrentTask);
+        btnRandom.addEventListener('click', loadRandomPrompt); // Listener for Random Button
         
         essayInput.addEventListener('input', () => {
             updateWordCount();
