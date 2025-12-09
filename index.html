@@ -14,10 +14,8 @@
             --border-color: #e2e8f0;  
             --primary: #2563eb;       
             --primary-hover: #1d4ed8; 
-            
-            /* UPDATED STATUS COLORS */
-            --warning: #d97706;       /* Amber for "Under Word Count" (Readable) */
-            --success: #059669;       /* Emerald Green */
+            --danger: #ef4444;
+            --success: #10b981;
             
             /* Toggle Switch Specifics */
             --toggle-track: #e2e8f0;
@@ -36,10 +34,6 @@
             --border-color: #334155;
             --primary: #60a5fa;
             --primary-hover: #3b82f6;
-            
-            /* DARK MODE STATUS COLORS */
-            --warning: #fbbf24;       /* Bright Amber (Great on Dark Blue) */
-            --success: #34d399;       /* Bright Mint Green */
             
             --toggle-track: #0f172a;
             --toggle-active: #334155;
@@ -73,13 +67,12 @@
             z-index: 10;
         }
 
-        /* Groups for alignment */
         .header-group { display: flex; align-items: center; gap: 12px; }
         .header-left { width: 240px; }
         .header-center { justify-content: center; flex: 1; }
         .header-right { width: 240px; justify-content: flex-end; }
 
-        /* SEGMENTED CONTROL (Task Switcher) */
+        /* SEGMENTED CONTROL */
         .task-toggle {
             display: flex;
             background: var(--toggle-track);
@@ -99,9 +92,7 @@
             border-radius: 6px;
             transition: all 0.2s ease;
         }
-
         .task-btn:hover { color: var(--text-main); }
-
         .task-btn.active {
             background: var(--toggle-active);
             color: var(--toggle-text-active);
@@ -109,127 +100,86 @@
             font-weight: 700;
         }
 
-        /* TIMER DISPLAY */
         #timer-display {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--text-main);
-            font-variant-numeric: tabular-nums;
-            min-width: 100px;
-            text-align: center;
-            letter-spacing: -1px;
+            font-size: 1.8rem; font-weight: 800; color: var(--text-main);
+            font-variant-numeric: tabular-nums; min-width: 100px; text-align: center; letter-spacing: -1px;
         }
 
-        /* UNIVERSAL BUTTON STYLE */
+        /* BUTTONS */
         .btn {
-            height: 36px;
-            padding: 0 16px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-panel);
-            color: var(--text-main);
-            border-radius: 6px;
-            font-weight: 600;
-            transition: all 0.15s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            height: 36px; padding: 0 16px; font-size: 0.85rem; cursor: pointer;
+            border: 1px solid var(--border-color); background-color: var(--bg-panel);
+            color: var(--text-main); border-radius: 6px; font-weight: 600;
+            transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-
-        .btn:hover {
-            border-color: var(--text-muted);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
-        }
-
+        .btn:hover { border-color: var(--text-muted); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
         .btn:active { transform: translateY(0); }
-
-        /* Primary Action Button (Start/Pause/Resume) */
-        #btn-action {
-            background-color: var(--primary);
-            border-color: var(--primary);
-            color: white;
-            min-width: 80px; /* Prevent resizing when text changes */
-        }
+        #btn-action { background-color: var(--primary); border-color: var(--primary); color: white; min-width: 80px; }
         #btn-action:hover { background-color: var(--primary-hover); }
 
-        /* GITHUB LINK */
+        /* GITHUB LINK WITH TOOLTIP */
         .github-link {
             display: flex; align-items: center; justify-content: center;
-            height: 36px; width: 36px;
-            border-radius: 6px;
-            transition: background 0.2s;
+            height: 36px; width: 36px; border-radius: 6px; transition: background 0.2s;
+            position: relative; /* For tooltip positioning */
         }
         .github-link:hover { background: var(--toggle-track); }
         .github-link svg { width: 22px; height: 22px; fill: var(--text-muted); transition: fill 0.2s; }
         .github-link:hover svg { fill: var(--text-main); }
+        
+        /* THE COOL TOOLTIP */
+        .github-link::after {
+            content: "⭐ Consider a star?";
+            position: absolute;
+            top: 110%; right: 0;
+            background: var(--bg-panel);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-5px);
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+            z-index: 100;
+        }
+        .github-link:hover::after { opacity: 1; transform: translateY(0); }
 
         /* MAIN LAYOUT */
         main { display: flex; flex: 1; overflow: hidden; padding: 16px; gap: 16px; }
 
         .panel {
-            background: var(--bg-panel);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            box-shadow: var(--shadow-sm);
-            transition: flex 0.3s ease;
+            background: var(--bg-panel); border-radius: 12px; border: 1px solid var(--border-color);
+            padding: 20px; display: flex; flex-direction: column; overflow-y: auto;
+            box-shadow: var(--shadow-sm); transition: flex 0.3s ease;
         }
-
         .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            flex-shrink: 0;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+            flex-shrink: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;
         }
+        h3, h4 { margin: 0; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
 
-        h3, h4 { 
-            margin: 0; font-size: 0.8rem; color: var(--text-muted); 
-            text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;
-        }
-
-        /* ZOOM BUTTONS */
         .zoom-controls { display: flex; gap: 6px; }
         .zoom-btn {
-            background: var(--bg-body);
-            border: none;
-            color: var(--text-muted);
-            width: 28px; height: 28px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.75rem; font-weight: bold;
+            background: var(--bg-body); border: none; color: var(--text-muted);
+            width: 28px; height: 28px; border-radius: 4px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;
             transition: all 0.2s;
         }
         .zoom-btn:hover { background-color: var(--border-color); color: var(--text-main); }
 
-        /* PANELS CONFIG */
-        .panel-left { flex: 4; gap: 16px; }
-        .panel-right { flex: 6; }
-        body.mode-task1 .panel-left { flex: 5; }
-        body.mode-task1 .panel-right { flex: 5; }
+        .panel-left { flex: 4; gap: 16px; } .panel-right { flex: 6; }
+        body.mode-task1 .panel-left { flex: 5; } body.mode-task1 .panel-right { flex: 5; }
 
         textarea {
-            width: 100%;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 16px;
+            width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-size: 1rem;
-            line-height: 1.6;
-            resize: none;
-            background-color: var(--bg-panel);
-            color: var(--text-main);
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            font-size: 1rem; line-height: 1.6; resize: none; background-color: var(--bg-panel);
+            color: var(--text-main); outline: none; transition: border-color 0.2s, box-shadow 0.2s;
         }
         textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
 
@@ -238,25 +188,28 @@
 
         /* IMAGE AREA */
         #prompt-image-area {
-            display: none; flex: 1;
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
-            align-items: center; justify-content: center;
-            background-color: var(--bg-body);
-            position: relative; overflow: hidden;
-            min-height: 300px; cursor: zoom-in;
-            transition: all 0.2s;
+            display: none; flex: 1; border: 2px dashed var(--border-color); border-radius: 8px;
+            align-items: center; justify-content: center; background-color: var(--bg-body);
+            position: relative; overflow: hidden; min-height: 300px; cursor: zoom-in; transition: all 0.2s;
         }
         #prompt-image-area:hover { border-color: var(--primary); background-color: rgba(37, 99, 235, 0.02); }
         #prompt-image-area.drag-over { background-color: rgba(37, 99, 235, 0.1); border-color: var(--primary); }
         #prompt-image-display { max-width: 100%; max-height: 100%; object-fit: contain; display: none; }
+        
+        /* REMOVE IMAGE BUTTON */
+        #btn-remove-img {
+            position: absolute; top: 10px; right: 10px; width: 28px; height: 28px;
+            background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%;
+            cursor: pointer; display: none; align-items: center; justify-content: center;
+            font-size: 16px; z-index: 5; transition: background 0.2s;
+        }
+        #btn-remove-img:hover { background: var(--danger); }
 
         /* LIGHTBOX */
         #lightbox-modal {
             display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
             background-color: rgba(15, 23, 42, 0.95); backdrop-filter: blur(4px);
-            justify-content: center; align-items: center; flex-direction: column;
-            animation: fadeIn 0.2s ease-out;
+            justify-content: center; align-items: center; flex-direction: column; animation: fadeIn 0.2s ease-out;
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         #lightbox-image { max-width: 90%; max-height: 85%; object-fit: contain; border-radius: 4px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
@@ -273,10 +226,9 @@
 
         #essay-input { flex: 1; margin-bottom: 0; }
         #footer-bar { display: flex; justify-content: flex-end; align-items: center; margin-top: 10px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
-
     </style>
 </head>
-<body class="mode-task1">
+<body class="mode-task1 dark-mode">
 
     <div id="lightbox-modal">
         <img id="lightbox-image" src="" alt="Full Screen Chart">
@@ -299,9 +251,9 @@
 
         <div class="header-group header-right">
             <button class="btn" id="btn-download">💾 Save</button>
-            <button class="btn" id="theme-toggle">🌙 Dark</button>
+            <button class="btn" id="theme-toggle">☀️ Light</button>
             
-            <a href="https://github.com/spideyonmoon/ielts-writing-simulator" target="_blank" class="github-link" title="View on GitHub">
+            <a href="https://github.com/spideyonmoon/ielts-writing-simulator" target="_blank" class="github-link">
                 <svg viewBox="0 0 16 16" version="1.1" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
             </a>
         </div>
@@ -320,7 +272,9 @@
                 
                 <textarea id="prompt-text-area" placeholder="Paste your essay question here..." style="display: none;"></textarea>
 
-                <div id="prompt-image-area" style="display: flex;" title="Click to view full screen">
+                <div id="prompt-image-area" title="Click to view full screen">
+                    <button id="btn-remove-img" title="Remove Image">×</button>
+                    
                     <div class="upload-msg">
                         <p><strong>Click or Paste (Ctrl+V)</strong></p>
                         <p>to upload Chart/Graph</p>
@@ -365,7 +319,7 @@
         // --- ELEMENTS ---
         const body = document.body;
         const timerDisplay = document.getElementById('timer-display');
-        const btnAction = document.getElementById('btn-action'); // SINGLE BUTTON
+        const btnAction = document.getElementById('btn-action'); 
         const btnReset = document.getElementById('btn-reset');
         const btnDownload = document.getElementById('btn-download');
         const themeToggle = document.getElementById('theme-toggle');
@@ -377,6 +331,7 @@
         const promptText = document.getElementById('prompt-text-area');
         const promptImgArea = document.getElementById('prompt-image-area');
         const promptImgDisplay = document.getElementById('prompt-image-display');
+        const btnRemoveImg = document.getElementById('btn-remove-img'); // REMOVE BUTTON
         const uploadMsg = document.querySelector('.upload-msg');
         const fileInput = document.getElementById('file-input');
         const noteLabel1 = document.getElementById('notes-label-1');
@@ -390,10 +345,14 @@
         let currentTime = totalTime;
         let timerInterval = null;
         let isRunning = false;
-        let isDarkMode = false;
+        let isDarkMode = true; // DEFAULT DARK
         let currentMode = 'task1';
         let leftTextSize = 16;
         let rightTextSize = 16;
+        
+        // --- SEPARATE ESSAY STORAGE ---
+        let task1Response = "";
+        let task2Response = "";
 
         // --- ZOOM ---
         function zoomText(d) {
@@ -407,32 +366,24 @@
             essayInput.style.fontSize = rightTextSize + "px";
         }
 
-        // --- TIMER LOGIC ---
+        // --- TIMER ---
         function formatTime(seconds) {
             const m = Math.floor(seconds / 60);
             const s = seconds % 60;
             return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
         }
-        
         function updateTimerDisplay() {
             timerDisplay.textContent = formatTime(currentTime);
-            // No color change here, user didn't ask for it to turn red in this fix
         }
-
-        // The unified toggleTimer function
         function toggleTimer() {
             if (isRunning) {
-                // Currently Running -> Go to PAUSE
                 clearInterval(timerInterval);
                 isRunning = false;
                 btnAction.textContent = "Resume";
             } else {
-                // Currently Paused/Stopped -> Go to START/RESUME
-                if(currentTime <= 0) return; // Don't start if time is 0
-                
+                if(currentTime <= 0) return;
                 isRunning = true;
                 btnAction.textContent = "Pause";
-                
                 timerInterval = setInterval(() => {
                     if (currentTime > 0) {
                         currentTime--;
@@ -446,9 +397,7 @@
                 }, 1000);
             }
         }
-
         function resetTimer() {
-            // Instant reset, no confirm
             clearInterval(timerInterval);
             isRunning = false;
             currentTime = totalTime;
@@ -458,13 +407,20 @@
 
         // --- MODE ---
         function setMode(mode) {
-            // If running, we still need to confirm because switching modes changes time
             if(isRunning) {
                 if(!confirm("Switching modes will reset timer. Continue?")) return;
-                toggleTimer(); // Pause it essentially
+                toggleTimer();
             }
             
+            // SAVE current text to variable
+            if (currentMode === 'task1') {
+                task1Response = essayInput.value;
+            } else {
+                task2Response = essayInput.value;
+            }
+
             currentMode = mode;
+            
             if (mode === 'task1') {
                 body.classList.remove('mode-task2'); body.classList.add('mode-task1');
                 totalTime = 20 * 60;
@@ -475,6 +431,10 @@
                 noteBox2.style.display = 'none';
                 promptTextZoom.style.display = 'none';
                 modeTask1.classList.add('active'); modeTask2.classList.remove('active');
+                
+                // LOAD Task 1 text
+                essayInput.value = task1Response;
+                
             } else {
                 body.classList.remove('mode-task1'); body.classList.add('mode-task2');
                 totalTime = 40 * 60;
@@ -485,8 +445,12 @@
                 noteBox2.style.display = 'flex';
                 promptTextZoom.style.display = 'flex';
                 modeTask1.classList.remove('active'); modeTask2.classList.add('active');
+                
+                // LOAD Task 2 text
+                essayInput.value = task2Response;
             }
-            resetTimer(); // Use resetTimer to set time correctly without confirm
+            
+            resetTimer(); 
             updateWordCount();
         }
 
@@ -499,14 +463,30 @@
                     promptImgDisplay.style.display = 'block';
                     lightboxImg.src = e.target.result;
                     uploadMsg.style.display = 'none';
+                    btnRemoveImg.style.display = 'flex'; // Show remove button
                 };
                 reader.readAsDataURL(file);
             }
         }
-        promptImgArea.addEventListener('click', () => {
+        
+        promptImgArea.addEventListener('click', (e) => {
+            // Prevent triggering lightbox if we click the remove button
+            if (e.target === btnRemoveImg) return;
+            
             if(promptImgDisplay.style.display === 'block') lightboxModal.style.display = 'flex';
             else fileInput.click();
         });
+        
+        // Remove Image Logic
+        btnRemoveImg.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop click from bubbling to promptImgArea
+            promptImgDisplay.src = '';
+            promptImgDisplay.style.display = 'none';
+            uploadMsg.style.display = 'block';
+            fileInput.value = ''; 
+            btnRemoveImg.style.display = 'none';
+        });
+
         lightboxModal.addEventListener('click', () => lightboxModal.style.display = 'none');
         document.addEventListener('keydown', (e) => { if (e.key === "Escape") lightboxModal.style.display = 'none'; });
         fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
@@ -527,12 +507,10 @@
         function updateWordCount() {
             const text = essayInput.value.trim();
             const count = text === '' ? 0 : text.split(/\s+/).length;
-            let color = 'var(--text-muted)'; // Default Grey
+            let color = 'var(--text-muted)';
             const limit = currentMode === 'task1' ? 150 : 250;
-            
-            if (count > 0 && count < limit) color = 'var(--warning)'; // Amber/Orange
-            if (count >= limit) color = 'var(--success)'; // Green
-            
+            if (count > 0 && count < limit) color = 'var(--warning)'; 
+            if (count >= limit) color = 'var(--success)';
             wordCountDisplay.textContent = `Words: ${count}`;
             wordCountDisplay.style.color = color;
         }
@@ -554,8 +532,8 @@
         }
 
         // --- LISTENERS ---
-        btnAction.addEventListener('click', toggleTimer); // Single button listener
-        btnReset.addEventListener('click', resetTimer);   // Direct reset
+        btnAction.addEventListener('click', toggleTimer); 
+        btnReset.addEventListener('click', resetTimer);   
         
         modeTask1.addEventListener('click', () => setMode('task1'));
         modeTask2.addEventListener('click', () => setMode('task2'));
