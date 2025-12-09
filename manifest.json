@@ -1,0 +1,15 @@
+{
+  "name": "IELTS Writing Simulator",
+  "short_name": "IELTS Sim",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
