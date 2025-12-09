@@ -7,15 +7,17 @@
     <style>
         :root {
             /* --- MODERN PALETTE --- */
-            --bg-body: #f1f5f9;       /* Light Slate Grey */
-            --bg-panel: #ffffff;      /* White */
-            --text-main: #0f172a;     /* Deep Navy (Almost Black) */
-            --text-muted: #64748b;    /* Slate Grey */
-            --border-color: #e2e8f0;  /* Subtle Border */
-            --primary: #2563eb;       /* Royal Blue */
+            --bg-body: #f1f5f9;       
+            --bg-panel: #ffffff;      
+            --text-main: #0f172a;     
+            --text-muted: #64748b;    
+            --border-color: #e2e8f0;  
+            --primary: #2563eb;       
             --primary-hover: #1d4ed8; 
-            --danger: #ef4444;
-            --success: #10b981;
+            
+            /* UPDATED STATUS COLORS */
+            --warning: #d97706;       /* Amber for "Under Word Count" (Readable) */
+            --success: #059669;       /* Emerald Green */
             
             /* Toggle Switch Specifics */
             --toggle-track: #e2e8f0;
@@ -34,6 +36,10 @@
             --border-color: #334155;
             --primary: #60a5fa;
             --primary-hover: #3b82f6;
+            
+            /* DARK MODE STATUS COLORS */
+            --warning: #fbbf24;       /* Bright Amber (Great on Dark Blue) */
+            --success: #34d399;       /* Bright Mint Green */
             
             --toggle-track: #0f172a;
             --toggle-active: #334155;
@@ -140,13 +146,14 @@
 
         .btn:active { transform: translateY(0); }
 
-        /* Primary Button (Start) */
-        #btn-start {
+        /* Primary Action Button (Start/Pause/Resume) */
+        #btn-action {
             background-color: var(--primary);
             border-color: var(--primary);
             color: white;
+            min-width: 80px; /* Prevent resizing when text changes */
         }
-        #btn-start:hover { background-color: var(--primary-hover); }
+        #btn-action:hover { background-color: var(--primary-hover); }
 
         /* GITHUB LINK */
         .github-link {
@@ -286,9 +293,8 @@
 
         <div class="header-group header-center">
             <div id="timer-display">20:00</div>
-            <button class="btn" id="btn-start">Start</button>
-            <button class="btn" id="btn-pause">Pause</button>
-            <button class="btn" id="btn-restart">Reset</button>
+            <button class="btn" id="btn-action">Start</button>
+            <button class="btn" id="btn-reset">Reset</button>
         </div>
 
         <div class="header-group header-right">
@@ -359,9 +365,8 @@
         // --- ELEMENTS ---
         const body = document.body;
         const timerDisplay = document.getElementById('timer-display');
-        const btnStart = document.getElementById('btn-start');
-        const btnPause = document.getElementById('btn-pause');
-        const btnRestart = document.getElementById('btn-restart');
+        const btnAction = document.getElementById('btn-action'); // SINGLE BUTTON
+        const btnReset = document.getElementById('btn-reset');
         const btnDownload = document.getElementById('btn-download');
         const themeToggle = document.getElementById('theme-toggle');
         const essayInput = document.getElementById('essay-input');
@@ -402,58 +407,63 @@
             essayInput.style.fontSize = rightTextSize + "px";
         }
 
-        // --- TIMER ---
+        // --- TIMER LOGIC ---
         function formatTime(seconds) {
             const m = Math.floor(seconds / 60);
             const s = seconds % 60;
             return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
         }
+        
         function updateTimerDisplay() {
             timerDisplay.textContent = formatTime(currentTime);
-            const threshold = currentMode === 'task1' ? 120 : 300;
-            if(currentTime < threshold) timerDisplay.style.color = 'var(--danger)';
-            else timerDisplay.style.color = 'var(--text-main)';
+            // No color change here, user didn't ask for it to turn red in this fix
         }
-        function startTimer() {
-            if (isRunning) return;
-            isRunning = true;
-            btnStart.disabled = true;
-            btnStart.style.opacity = "0.7";
-            timerInterval = setInterval(() => {
-                if (currentTime > 0) {
-                    currentTime--;
-                    updateTimerDisplay();
-                } else {
-                    clearInterval(timerInterval);
-                    isRunning = false;
-                    alert("Time is up!");
-                }
-            }, 1000);
+
+        // The unified toggleTimer function
+        function toggleTimer() {
+            if (isRunning) {
+                // Currently Running -> Go to PAUSE
+                clearInterval(timerInterval);
+                isRunning = false;
+                btnAction.textContent = "Resume";
+            } else {
+                // Currently Paused/Stopped -> Go to START/RESUME
+                if(currentTime <= 0) return; // Don't start if time is 0
+                
+                isRunning = true;
+                btnAction.textContent = "Pause";
+                
+                timerInterval = setInterval(() => {
+                    if (currentTime > 0) {
+                        currentTime--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        btnAction.textContent = "Start";
+                        alert("Time is up!");
+                    }
+                }, 1000);
+            }
         }
-        function pauseTimer() {
-            if (!isRunning) return;
-            clearInterval(timerInterval);
-            isRunning = false;
-            btnStart.disabled = false;
-            btnStart.style.opacity = "1";
-            btnStart.textContent = "Resume";
-        }
-        function restartTimer() {
+
+        function resetTimer() {
+            // Instant reset, no confirm
             clearInterval(timerInterval);
             isRunning = false;
             currentTime = totalTime;
-            btnStart.disabled = false;
-            btnStart.style.opacity = "1";
-            btnStart.textContent = "Start";
+            btnAction.textContent = "Start";
             updateTimerDisplay();
         }
 
         // --- MODE ---
         function setMode(mode) {
+            // If running, we still need to confirm because switching modes changes time
             if(isRunning) {
                 if(!confirm("Switching modes will reset timer. Continue?")) return;
-                pauseTimer();
+                toggleTimer(); // Pause it essentially
             }
+            
             currentMode = mode;
             if (mode === 'task1') {
                 body.classList.remove('mode-task2'); body.classList.add('mode-task1');
@@ -476,7 +486,7 @@
                 promptTextZoom.style.display = 'flex';
                 modeTask1.classList.remove('active'); modeTask2.classList.add('active');
             }
-            restartTimer();
+            resetTimer(); // Use resetTimer to set time correctly without confirm
             updateWordCount();
         }
 
@@ -517,15 +527,16 @@
         function updateWordCount() {
             const text = essayInput.value.trim();
             const count = text === '' ? 0 : text.split(/\s+/).length;
-            let color = 'var(--text-muted)';
+            let color = 'var(--text-muted)'; // Default Grey
             const limit = currentMode === 'task1' ? 150 : 250;
-            if (count > 0 && count < limit) color = 'var(--danger)'; 
-            if (count >= limit) color = 'var(--success)';
+            
+            if (count > 0 && count < limit) color = 'var(--warning)'; // Amber/Orange
+            if (count >= limit) color = 'var(--success)'; // Green
+            
             wordCountDisplay.textContent = `Words: ${count}`;
             wordCountDisplay.style.color = color;
         }
         
-        // --- NEW THEME LOGIC ---
         function toggleTheme() {
             isDarkMode = !isDarkMode;
             body.classList.toggle('dark-mode');
@@ -543,9 +554,9 @@
         }
 
         // --- LISTENERS ---
-        btnStart.addEventListener('click', startTimer);
-        btnPause.addEventListener('click', () => { if(isRunning) pauseTimer(); else if(currentTime<totalTime && currentTime>0){ startTimer(); btnPause.textContent="Pause"; }});
-        btnRestart.addEventListener('click', () => { if(confirm("Reset?")) restartTimer(); });
+        btnAction.addEventListener('click', toggleTimer); // Single button listener
+        btnReset.addEventListener('click', resetTimer);   // Direct reset
+        
         modeTask1.addEventListener('click', () => setMode('task1'));
         modeTask2.addEventListener('click', () => setMode('task2'));
         themeToggle.addEventListener('click', toggleTheme);
