@@ -61,7 +61,7 @@
 
         /* --- HEADER --- */
         header {
-            height: 68px; /* Restored comfortable height */
+            height: 64px; 
             background-color: var(--bg-panel);
             border-bottom: 1px solid var(--border-color);
             display: flex;
@@ -72,7 +72,7 @@
             z-index: 10;
         }
 
-        .header-group { display: flex; align-items: center; gap: 16px; } /* More breathing room */
+        .header-group { display: flex; align-items: center; gap: 16px; } 
         .header-left { width: 220px; }
         .header-center { justify-content: center; flex: 1; }
         .header-right { width: 220px; justify-content: flex-end; }
@@ -118,7 +118,7 @@
 
         /* BUTTONS - BIGGER & BETTER */
         .btn {
-            height: 38px; /* Increased from 30px */
+            height: 38px; 
             padding: 0 14px; 
             font-size: 0.95rem; 
             cursor: pointer;
@@ -134,7 +134,7 @@
         .btn:hover { border-color: var(--text-muted); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
         .btn:active { transform: translateY(0); }
         
-        /* Specific Emoji Button sizing */
+        /* Header Emoji Buttons */
         .header-right .btn { font-size: 1.2rem; padding: 0 12px; } 
 
         #btn-action { background-color: var(--primary); border-color: var(--primary); color: white; min-width: 80px; }
@@ -146,16 +146,18 @@
             height: 38px; width: 38px; border-radius: 6px; transition: background 0.2s;
             position: relative; 
             cursor: pointer;
+            /* Ensure text decoration is removed */
+            text-decoration: none; 
         }
         .github-link:hover { background: var(--toggle-track); }
         .github-link svg { width: 22px; height: 22px; fill: var(--text-muted); transition: fill 0.2s; }
         .github-link:hover svg { fill: var(--text-main); }
 
-        /* The Tooltip */
+        /* The Tooltip - Fixed Z-Index and Position */
         .github-link::after {
             content: "⭐ Consider a star?"; 
             position: absolute; 
-            top: 115%; right: 0;
+            top: 120%; right: 0;
             background: var(--bg-panel); 
             color: var(--text-main); 
             border: 1px solid var(--border-color);
@@ -166,8 +168,8 @@
             opacity: 0; pointer-events: none; 
             transform: translateY(-5px);
             transition: all 0.2s ease; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15); 
+            z-index: 9999;
         }
         .github-link:hover::after { opacity: 1; transform: translateY(0); }
 
@@ -177,7 +179,7 @@
         .panel {
             background: var(--bg-panel); border-radius: 8px;
             border: 1px solid var(--border-color);
-            padding: 20px; display: flex; flex-direction: column; overflow-y: auto;
+            padding: 16px; display: flex; flex-direction: column; overflow-y: auto;
             box-shadow: var(--shadow-sm); 
             min-width: 200px; 
         }
@@ -190,28 +192,28 @@
         .resizer:hover, .resizer.resizing { background: var(--toggle-track); }
         .resizer::after { content: ""; width: 2px; height: 24px; background: var(--border-color); border-radius: 1px; }
 
-        /* PANEL HEADERS */
+        /* PANEL HEADERS - SHRUNK BORDERS */
         .panel-header {
             display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 12px; 
+            margin-bottom: 10px; 
             flex-shrink: 0; border-bottom: 1px solid var(--border-color); 
             padding-bottom: 8px; 
         }
         h3 { margin: 0; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
 
         /* Controls spacing fixes */
-        .controls-group { display: flex; gap: 12px; align-items: center; } /* Wider gap */
+        .controls-group { display: flex; gap: 12px; align-items: center; } 
         
         /* Larger + - buttons */
         .icon-btn { 
-            padding: 0; width: 32px; height: 32px; /* Bigger touch target */
-            font-size: 1.1rem; 
+            padding: 0; width: 32px; height: 32px; 
+            font-size: 1.2rem; display: flex; align-items: center; justify-content: center; padding-bottom: 3px;
         }
 
-        /* Beautiful Select Dropdown */
+        /* BEAUTIFIED DROPDOWN */
         .styled-select {
             height: 32px;
-            padding: 0 8px;
+            padding: 0 10px;
             border-radius: 6px;
             border: 1px solid var(--border-color);
             background-color: var(--bg-panel);
@@ -222,6 +224,18 @@
             outline: none;
             margin-right: 8px;
             transition: border-color 0.2s;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            /* Add custom arrow */
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23444444%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 8px;
+            padding-right: 24px;
+        }
+        body.dark-mode .styled-select {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
         }
         .styled-select:hover { border-color: var(--text-muted); }
         .styled-select:focus { border-color: var(--primary); }
@@ -255,10 +269,11 @@
         #btn-remove-img:hover { background: var(--danger); }
 
         /* PLANNING & FOOTER */
-        .planning-section { display: flex; flex-direction: column; min-height: 150px; margin-top: 16px; }
+        .planning-section { display: flex; flex-direction: column; min-height: 150px; margin-top: 12px; }
         .planning-grid { display: flex; gap: 16px; flex: 1; }
         .plan-box { flex: 1; display: flex; flex-direction: column; }
         
+        /* HIDE NOTE HEADERS */
         .plan-box .panel-header { display: none; }
         .plan-box textarea { flex: 1; font-size: 0.9rem; height: 100%; }
 
@@ -577,9 +592,9 @@
 
         // --- MODE SWITCHING ---
         function setMode(mode, initialLoad = false) {
+            // Removed the confirm("Switching modes") annoyance
             if(isRunning && !initialLoad) {
-                if(!confirm("Switching modes will reset timer. Continue?")) return;
-                toggleTimer(); 
+                toggleTimer(); // Just pause it silently
             }
             if (!initialLoad) saveCurrentWork();
 
@@ -731,6 +746,7 @@
         function toggleTheme() {
             isDarkMode = !isDarkMode;
             body.classList.toggle('dark-mode');
+            // Logic Flip: Show Moon if we are in Light Mode (to switch to dark), Show Sun if in Dark Mode
             themeToggle.innerHTML = isDarkMode ? "☀️" : "🌙";
         }
         
@@ -779,7 +795,8 @@
 
         // --- FETCH RANDOM PROMPT ---
         async function loadRandomPrompt() {
-            if(promptText.value.trim() !== "" && !confirm("This will replace your current prompt. Continue?")) return;
+            // No confirmation prompt anymore!
+            
             const btn = document.getElementById('btn-random');
             btn.disabled = true;
             const originalText = btn.textContent;
